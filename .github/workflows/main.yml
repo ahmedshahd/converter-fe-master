@@ -1,0 +1,43 @@
+# This workflow will do a clean install of node dependencies, 
+# build the source code and run tests across different versions of node
+# For more information see: 
+# https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
+
+name: Node.js CI
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+          cache: 'yarn'
+      - run: yarn install
+      - run: |
+          touch .env
+          echo NG_APP_DOMAIN=${{ secrets.NG_APP_DOMAIN }} >> .env
+          echo NG_APP_CLIENT_ID=${{ secrets.NG_APP_CLIENT_ID }} >> .env
+          echo NG_APP_AUDIENCE=${{ secrets.NG_APP_AUDIENCE }} >> .env
+          echo NG_APP_API_URI=${{ secrets.NG_APP_API_URI }} >> .env
+          echo NG_APP_APP_URI=${{ secrets.NG_APP_APP_URI }} >> .env
+          echo NG_APP_ERROR_PATH=${{ secrets.NG_APP_ERROR_PATH }} >> .env
+      - run: yarn build
+
+      - name: Install SSH Key
+        uses: shimataro/ssh-key-action@v2
+        with:
+          key: ${{ secrets.PRIVATE_KEY }}
+          known_hosts: 'just-a-placeholder-so-we-dont-get-errors'
+      - name: Adding Known Hosts
+        run: ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Deploy with rsync
+        run: rsync -avuz  ./dist/login-demo/* ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/var/www/html
+      

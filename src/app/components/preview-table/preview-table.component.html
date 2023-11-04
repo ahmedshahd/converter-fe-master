@@ -1,0 +1,50 @@
+<div class=" pt-2 pl-1 container-fluid " *ngIf="data">
+  <p>
+    <button
+      type="button"
+      class="btn btn-outline-success"
+      (click)="collapse.toggle()"
+      [attr.aria-expanded]="!isCollapsed"
+      aria-controls="collapseExample"
+    >
+      Toggle preview table
+    </button>
+  </p>
+
+
+  <div class="collapse multi-collapse" id="tablePreviewCollapse" #collapse="ngbCollapse" [(ngbCollapse)]="isCollapsed">
+    <div class="form-group">
+      <div class="col">
+        <label for="numberOfRows">Number of rows</label>
+        <input type="number" min="0" max="500" [(ngModel)]="numberOfRows" class="form-control" id="numberOfRows">
+      </div>
+      <div class="col">
+        <label for="sheet">Sheet</label>
+        <select name="sheet" id="sheet" class="form-control" (change)="onChangeSheet($event)">
+          <option *ngFor="let sheetName of previewWorkbook.SheetNames" value="{{sheetName}}">{{sheetName}}</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn btn-success" (click)="onSave()">Export XLSX</button>
+
+    <table class="table table-responsive">
+      <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col" *ngFor="let header of data[0]">{{header}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let row of data | slice:1:numberOfRows + 1; let i = index">
+        <th scope="row">{{i + 1}}</th>
+        <td *ngFor="let cell of row">{{cell}}</td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="spinner-border" role="status" *ngIf="loading">
+  <span class="sr-only">Loading...</span>
+</div>

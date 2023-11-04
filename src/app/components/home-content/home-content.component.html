@@ -1,0 +1,35 @@
+<div class="container-fluid">
+  <div class="container">
+    <form class="next-steps my-5" action="" xmlns="http://www.w3.org/1999/html" (ngSubmit)="onSubmit()"
+          #excelForm="ngForm" >
+      <div class="form-group">
+        <label for="file" class="form-label">Excel file</label>
+        <input class="form-control" type="file" name="file" id="file" (change)="handleFileChange($event)">
+      </div>
+
+      <div class="form-group">
+        <label for="inputType" class="form-label">File type</label>
+        <select class="form-control" name="inputType" id="inputType" [(ngModel)]="model.inputType">
+          <option *ngFor="let converter of converters;" value="{{converter.inputType}}">{{converter.inputType}}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="company" class="form-label">Company name</label>
+        <select class="form-control" [(ngModel)]="model.company" name="company" id="company">
+          <option *ngFor="let companyName of companyNames" value="{{companyName}}">{{companyName}}</option>
+        </select>
+      </div>
+      <button [disabled]="submitting" type="submit" class="btn btn-primary">
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" *ngIf="submitting"></span>
+        Submit
+      </button>
+      <div class="alert alert-danger" role="alert" *ngIf="apiError">
+        ⚠ {{apiError}}
+      </div>
+      <app-preview-table *ngIf="!submitting" [fileName]="model.file?.name" [previewData]="_previewData"></app-preview-table>
+
+    </form>
+  </div>
+
+</div>

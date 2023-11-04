@@ -1,0 +1,11 @@
+<div class="container" *ngIf="auth.isLoading$ | async; else loaded">
+  <app-loading></app-loading>
+</div>
+
+<ng-template #loaded>
+  <app-home-content *ngIf="auth.isAuthenticated$ | async; else loginRequired"></app-home-content>
+</ng-template>
+
+<ng-template #loginRequired>
+  <div>Please login to use the app</div>
+</ng-template>
